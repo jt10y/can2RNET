@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-import socket, sys, os, array, threading
+import keyboard, socket, sys, os, array, threading
 from time import *
 from fcntl import ioctl
 from can2RNET import *
@@ -293,8 +293,10 @@ def RNETplaysong(cansocket):
 #do very little and output something as sign-of-life
 def watch_and_wait():
     started_time = time()
-    while threading.active_count() > 0 and rnet_threads_running:
-        sleep(0.5)
+    while not keyboard.is_pressed('F5') and threading.active_count() > 0 and rnet_threads_running:
+        if keyboard.is_pressed('F5'):
+            print("E-Stop Detected!")
+        sleep(0.1)
         print(str(round(time()-started_time,2))+'\tX: '+dec2hex(joystick_x,2)+'\tY: '+dec2hex(joystick_y,2)+ '\tThreads: '+str(threading.active_count()))
 
 #does not use a thread queue.  Instead just sets a global flag.
