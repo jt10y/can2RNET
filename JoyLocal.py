@@ -294,8 +294,6 @@ def RNETplaysong(cansocket):
 def watch_and_wait():
     started_time = time()
     while not keyboard.is_pressed('F5') and threading.active_count() > 0 and rnet_threads_running:
-        if keyboard.is_pressed('F5'):
-            print("E-Stop Detected!")
         sleep(0.1)
         print(str(round(time()-started_time,2))+'\tX: '+dec2hex(joystick_x,2)+'\tY: '+dec2hex(joystick_y,2)+ '\tThreads: '+str(threading.active_count()))
 
