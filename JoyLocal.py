@@ -22,7 +22,7 @@ import keyboard, socket, sys, os, array, threading
 from time import *
 from fcntl import ioctl
 from can2RNET import *
-
+import serial
 
 debug = True
 
@@ -292,10 +292,18 @@ def RNETplaysong(cansocket):
 
 #do very little and output something as sign-of-life
 def watch_and_wait():
+    global serial 
+    serial = serial.Serial('/dev/ttyACM0', 115200)
+    print("E-Stop Serial Port: " + serial.name + "\n")
     started_time = time()
-    while not keyboard.is_pressed('F5') and threading.active_count() > 0 and rnet_threads_running:
+    while threading.active_count() > 0 and rnet_threads_running:
         sleep(0.1)
-        print(str(round(time()-started_time,2))+'\tX: '+dec2hex(joystick_x,2)+'\tY: '+dec2hex(joystick_y,2)+ '\tThreads: '+str(threading.active_count()))
+        e_stop = serial.read(2)
+        if (e_stop.decode() == "f5"):
+            print("E-Stop Requested")
+            kill_rnet_threads()
+        else:
+            print(str(round(time()-started_time,2))+'\tX: '+dec2hex(joystick_x,2)+'\tY: '+dec2hex(joystick_y,2)+ '\tThreads: '+str(threading.active_count()))
 
 #does not use a thread queue.  Instead just sets a global flag.
 def kill_rnet_threads():
@@ -365,6 +373,10 @@ if __name__ == "__main__":
     global joystick_y
     rnet_threads_running = True
     can_socket = opencansocket(0)
+
+    #global serial
+    #serial = serial.Serial('/dev/ttyACM0', 115200)
+    #print("E-Stop Serial Port: " + serial.name)
 
     #init usb joystick
     x360 = X360()
